@@ -7,7 +7,7 @@ export pwd = $(shell pwd)
 export obj = $(pwd)/obj
 export mod = $(pwd)/mod
 
-progdirs:= units parser myCol
+progdirs:= units parser Langevin myCol
 
 .PHONY: all prog clean
 

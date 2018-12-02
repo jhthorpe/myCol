@@ -2,5 +2,6 @@ calc	Lgv
 massA+	40
 massB	26
 temp	300
-aB	10		 
-units	au
+aB	5.69E-24		 
+units	cgs
+charge	+1

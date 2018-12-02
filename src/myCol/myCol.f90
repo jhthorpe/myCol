@@ -7,6 +7,7 @@
   !calc
 PROGRAM myCol
   USE parser
+  USE langevin
   IMPLICIT NONE
   INTEGER :: calc
 
@@ -15,6 +16,9 @@ PROGRAM myCol
   CALL clean()
   CALL print_init()
   CALL get_input(calc)
+  IF (calc .EQ. 0) THEN
+    CALL calc_Lgv()
+  END IF
 
   CONTAINS
 !---------------------------------------------------------------------

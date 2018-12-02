@@ -131,13 +131,13 @@ MODULE parser
     INTEGER, INTENT(IN) :: fline
     !INTERNAL
     CHARACTER(LEN=20), DIMENSION(0:1) :: line 
-    CHARACTER(LEN=10), DIMENSION(0:4) :: names
-    REAL(KIND=8), DIMENSION(0:3) :: vals
-    LOGICAL, DIMENSION(0:4) :: found
+    CHARACTER(LEN=10), DIMENSION(0:5) :: names
+    REAL(KIND=8), DIMENSION(0:4) :: vals
+    LOGICAL, DIMENSION(0:5) :: found
     INTEGER :: i,units
 
     units = 0 !cgs by default
-    names = ['massA+','massB ','temp  ','aB    ','units ']
+    names = ['massA+','massB ','temp  ','aB    ','charge','units ']
     found = .FALSE.
 
     !read in options
@@ -153,14 +153,16 @@ MODULE parser
         CALL get_temp(line(1),vals(2),found(2))
       ELSE IF (line(0) == 'aB') THEN
         CALL get_pol(line(1),vals(3),found(3))
+      ELSE IF (line(0) == 'charge') THEN
+        CALL get_charge(line(1),vals(4),found(4))
       ELSE IF (line(0) == 'units') THEN
-        CALL get_units(line(1),units,found(4))
+        CALL get_units(line(1),units,found(5))
       END IF
     END DO
     CLOSE(unit=100)
 
     !check we have what we need
-    DO i=0,3
+    DO i=0,4
       IF (.NOT. found(i)) THEN 
         WRITE(*,*) "You are missing ", names(i)
         CALL EXECUTE_COMMAND_LINE('touch error')
@@ -169,7 +171,7 @@ MODULE parser
     END DO
 
     IF (flag) RETURN
-    IF (.NOT. found(4)) WRITE(*,*) "Assuming cgs units"
+    IF (.NOT. found(5)) WRITE(*,*) "Assuming cgs units"
 
     !transform units
     CALL unit_trans_Lgv(vals,units)
@@ -233,6 +235,20 @@ MODULE parser
     END IF
   END SUBROUTINE get_temp
 !---------------------------------------------------------------------
+!	get_charge
+!		James H. Thorpe
+!		Dec 1, 2018
+!	-gets temperatures 
+!---------------------------------------------------------------------
+  SUBROUTINE get_charge(chr,val,found)
+    IMPLICIT NONE
+    CHARACTER(LEN=20), INTENT(IN) :: chr
+    REAL(KIND=8), INTENT(INOUT) :: val
+    LOGICAL, INTENT(INOUT) :: found
+    READ (chr,*) val
+    found = .TRUE.
+  END SUBROUTINE get_charge
+!---------------------------------------------------------------------
 !	get_units
 !		James H. Thorpe
 !		Dec 1, 2018
@@ -262,18 +278,20 @@ MODULE parser
 !---------------------------------------------------------------------
   SUBROUTINE unit_trans_Lgv(old_val,units)
     IMPLICIT NONE
-    REAL(KIND=8), PARAMETER :: A2B=(1.8897161646320724D0)
+    REAL(KIND=8), PARAMETER :: A2B=1.8897161646320724D0,&
+                               ec=4.80320427D-10
     !INOUT
     REAL(KIND=8), DIMENSION(0:), INTENT(IN) :: old_val 
     INTEGER, INTENT(IN) :: units
     !INTERNAL
-    REAL(KIND=8), DIMENSION(0:3) :: new_val
+    REAL(KIND=8), DIMENSION(0:4) :: new_val
     INTEGER :: i
 
     !all masses must be transformed
     new_val(0) = old_val(0)*1.660539E-24 !gfm -> g/molecule
     new_val(1) = old_val(1)*1.660539E-24 !gfm -> g/molecule
     new_val(2) = old_val(2) !temp is fine
+    new_val(4) = old_val(4)*ec !q -> Fr 
     
     !polarizability is more complicated
     IF (units .EQ. 0) THEN !cgs, do nothing
@@ -289,6 +307,7 @@ MODULE parser
     WRITE(*,*) "massB",new_val(1)
     WRITE(*,*) "temp",new_val(2)
     WRITE(*,*) "aB",new_val(3)
+    WRITE(*,*) "charge",new_val(4)
 
     OPEN(file='Lgv_vals',unit=101,status='replace')
       WRITE(101,*) new_val
