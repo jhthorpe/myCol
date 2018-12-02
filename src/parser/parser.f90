@@ -303,11 +303,11 @@ MODULE parser
 
     WRITE(*,*) "-------------------------------------"
     WRITE(*,*) "Values in cgs" 
-    WRITE(*,*) "massA+",new_val(0)
-    WRITE(*,*) "massB",new_val(1)
-    WRITE(*,*) "temp",new_val(2)
-    WRITE(*,*) "aB",new_val(3)
-    WRITE(*,*) "charge",new_val(4)
+    WRITE(*,*) "massA+  ",new_val(0)
+    WRITE(*,*) "massB   ",new_val(1)
+    WRITE(*,*) "temp    ",new_val(2)
+    WRITE(*,*) "aB      ",new_val(3)
+    WRITE(*,*) "charge  ",new_val(4)
 
     OPEN(file='Lgv_vals',unit=101,status='replace')
       WRITE(101,*) new_val
