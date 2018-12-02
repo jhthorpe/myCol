@@ -39,6 +39,7 @@ MODULE parser
       WRITE(*,*) "------------------------------------------------------" 
       STOP
     END IF
+    WRITE(*,*) "------------------------------------------------------" 
 
   END SUBROUTINE get_input  
 !---------------------------------------------------------------------
@@ -130,14 +131,16 @@ MODULE parser
     INTEGER, INTENT(IN) :: fline
     !INTERNAL
     CHARACTER(LEN=20), DIMENSION(0:1) :: line 
-    CHARACTER(LEN=10), DIMENSION(0:3) :: names
+    CHARACTER(LEN=10), DIMENSION(0:4) :: names
     REAL(KIND=8), DIMENSION(0:3) :: vals
     LOGICAL, DIMENSION(0:4) :: found
     INTEGER :: i,units
 
-    names = ['massA+','massB ','aB    ','temp  ']
+    units = 0 !cgs by default
+    names = ['massA+','massB ','temp  ','aB    ','units ']
     found = .FALSE.
 
+    !read in options
     OPEN(unit=100,file='input',status='old')
     DO i=0,fline-1
       READ(100,*) line 
@@ -146,21 +149,30 @@ MODULE parser
         CALL get_mass(line(1),vals(0),found(0)) 
       ELSE IF (line(0) == 'massB') THEN
         CALL get_mass(line(1),vals(1),found(1))
-      ELSE IF (line(0) == 'aB') THEN
-        CALL get_pol(line(1),vals(2),found(2))
       ELSE IF (line(0) == 'temp') THEN
-        CALL get_temp(line(1),vals(3),found(3))
+        CALL get_temp(line(1),vals(2),found(2))
+      ELSE IF (line(0) == 'aB') THEN
+        CALL get_pol(line(1),vals(3),found(3))
+      ELSE IF (line(0) == 'units') THEN
+        CALL get_units(line(1),units,found(4))
       END IF
     END DO
     CLOSE(unit=100)
 
-    DO i=0,3 
+    !check we have what we need
+    DO i=0,3
       IF (.NOT. found(i)) THEN 
         WRITE(*,*) "You are missing ", names(i)
         CALL EXECUTE_COMMAND_LINE('touch error')
         flag = .TRUE.
       END IF
     END DO
+
+    IF (flag) RETURN
+    IF (.NOT. found(4)) WRITE(*,*) "Assuming cgs units"
+
+    !transform units
+    CALL unit_trans_Lgv(vals,units)
 
   END SUBROUTINE get_Lgv
 
@@ -220,6 +232,69 @@ MODULE parser
       found = .TRUE.
     END IF
   END SUBROUTINE get_temp
+!---------------------------------------------------------------------
+!	get_units
+!		James H. Thorpe
+!		Dec 1, 2018
+!	-gets units 
+!---------------------------------------------------------------------
+  SUBROUTINE get_units(chr,val,found)
+    IMPLICIT NONE
+    CHARACTER(LEN=20), INTENT(IN) :: chr
+    INTEGER, INTENT(INOUT) :: val 
+    LOGICAL, INTENT(INOUT) :: found
+    IF (chr .EQ. 'cgs') THEN
+      val = 0
+      found = .TRUE.
+    ELSE IF (chr .EQ. 'au') THEN
+      val = 1
+      found = .TRUE. 
+    ELSE IF (chr .EQ. 'SI') THEN
+      val = 2
+      found = .TRUE.  
+   END IF
+  END SUBROUTINE get_units
+!---------------------------------------------------------------------
+!	unit_trans_Lgv
+!		James H. Thorpe
+!		Dec 1., 2018
+!	-transform values into cgs units for Langevin calculation
+!---------------------------------------------------------------------
+  SUBROUTINE unit_trans_Lgv(old_val,units)
+    IMPLICIT NONE
+    REAL(KIND=8), PARAMETER :: A2B=(1.8897161646320724D0)
+    !INOUT
+    REAL(KIND=8), DIMENSION(0:), INTENT(IN) :: old_val 
+    INTEGER, INTENT(IN) :: units
+    !INTERNAL
+    REAL(KIND=8), DIMENSION(0:3) :: new_val
+    INTEGER :: i
+
+    !all masses must be transformed
+    new_val(0) = old_val(0)*1.660539E-24 !gfm -> g/molecule
+    new_val(1) = old_val(1)*1.660539E-24 !gfm -> g/molecule
+    new_val(2) = old_val(2) !temp is fine
+    
+    !polarizability is more complicated
+    IF (units .EQ. 0) THEN !cgs, do nothing
+      new_val(3) = old_val(3) 
+    ELSE IF (units .EQ. 1) THEN !au. transform
+      new_val(3) = old_val(3)/(A2B**3.0D0)   
+      new_val(3) = new_val(3)*((1.0D-8)**3.0)
+    END IF
+
+    WRITE(*,*) "-------------------------------------"
+    WRITE(*,*) "Values in cgs" 
+    WRITE(*,*) "massA+",new_val(0)
+    WRITE(*,*) "massB",new_val(1)
+    WRITE(*,*) "temp",new_val(2)
+    WRITE(*,*) "aB",new_val(3)
+
+    OPEN(file='Lgv_vals',unit=101,status='replace')
+      WRITE(101,*) new_val
+    CLOSE(unit=101,status='keep')
+
+  END SUBROUTINE unit_trans_Lgv
 !---------------------------------------------------------------------
 
 END MODULE parser

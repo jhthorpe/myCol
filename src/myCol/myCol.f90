@@ -12,10 +12,19 @@ PROGRAM myCol
 
   calc = 0
 
+  CALL clean()
   CALL print_init()
   CALL get_input(calc)
 
   CONTAINS
+!---------------------------------------------------------------------
+!		clean
+!			James H. Thorpe
+!		-cleans old junk
+!---------------------------------------------------------------------
+  SUBROUTINE clean()
+    CALL EXECUTE_COMMAND_LINE('rm Lgv_vals error 2> /dev/null')
+  END SUBROUTINE clean
 !---------------------------------------------------------------------
 !               print_init
 !                       James H. Thorpe
