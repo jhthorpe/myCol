@@ -64,7 +64,7 @@ MODULE units
 
     IF (prop .EQ. 'dipo') THEN !a.u. -> esu*cm
       val = val/0.393430307 !au -> debye
-      val = val*1D-18 !debye -> esu*cm
+      val = val*1.0D-18 !debye -> esu*cm
     ELSE IF (prop .EQ. 'pola') THEN !a.u. -> cm^3
       val = val/(A2B**3.0D0) !borh -> Å
       val = val*((1.0D-8)**3.0) !Å -> cm
@@ -99,7 +99,7 @@ MODULE units
     val = lit
 
     IF (prop .EQ. 'dipo') THEN !D -> 10^-18 esu*cm
-      val = val*2.541580252938067D-18
+      val = val*1.0D-18
     ELSE IF (prop .EQ. 'pola') THEN !Å^3 -> cm^3
       val = val*((1.0D-8)**3.0)
     ELSE IF (prop .EQ. 'char') THEN !charge -> q_esu (g^.5 cm^1.5 s^-1)

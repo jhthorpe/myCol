@@ -67,22 +67,9 @@ MODULE lda
     WRITE(*,*) "k(v_rms)  (cm^3/s)  = ", eval_rate_lda(v_rms,qa,uab,alB,dpl)*1.0D9 
     WRITE(*,*) "k(v_avg)  (cm^3/s)  = ", eval_rate_lda(v_avg,qa,uab,alB,dpl)*1.0D9 
     WRITE(*,*) "k(v_mp)   (cm^3/s)  = ", eval_rate_lda(v_mp,qa,uab,alB,dpl)*1.0D9 
-    WRITE(*,*) "<k> @T    (cm^3/s)  = ", 2*pi*qa/SQRT(uab)*(SQRT(alB)+dpl*&
-                                            SQRT(2.0D0/(pi*kb*T)))*1.0D9
+    WRITE(*,*) "<k> @T    (cm^3/s)  = ", 2*pi*qa/uab*(SQRT(uab*alB)+2.0D0*dpl*&
+                                            SQRT(uab/(pi*kb*T)))*1.0D9
     WRITE(*,*) "====================================================================="
-    WRITE(*,*) "in cgs..."
-    WRITE(*,*) "testing, v =, k=, ", v_avg/10.0D0, &
-    eval_rate_lda(v_avg/10.0D0,qa,uab,alB,dpl)*1.0D9
-    WRITE(*,*) "testing, v =, k=, ", v_avg/100.0D0, &
-    eval_rate_lda(v_avg/100.0D0,qa,uab,alB,dpl)*1.0D9
-    WRITE(*,*) "testing, v =, k=, ", v_avg/1000.0D0, &
-    eval_rate_lda(v_avg/1000.0D0,qa,uab,alB,dpl)*1.0D9
-    WRITE(*,*) "testing, v =, k=, ", v_avg/10000.0D0, &
-    eval_rate_lda(v_avg/10000.0D0,qa,uab,alB,dpl)*1.0D9
-    WRITE(*,*) "testing, v =, k=, ", v_avg/100000.0D0, &
-    eval_rate_lda(v_avg/100000.0D0,qa,uab,alB,dpl)*1.0D9
-    WRITE(*,*) "testing, v =, k=, ", v_avg/1000000.0D0, &
-    eval_rate_lda(v_avg/1000000.0D0,qa,uab,alB,dpl)*1.0D9
      
   END SUBROUTINE calc_lda
 !---------------------------------------------------------------------
@@ -101,11 +88,14 @@ MODULE lda
                                kb=1.38064852D-16
     REAL(KIND=8), INTENT(IN) :: v,q,uab,ab,dpl
     REAL(KIND=8) :: s
-    s = 2*pi*q/(SQRT(uab)*v)*(SQRT(ab) + dpl/v) 
+    !s = 2*pi*q/(SQRT(uab)*v)*(SQRT(ab) + dpl/v)  !theirs, wrong??
+    ! or perhaps correct, just not in cgs?
+    s = 2*pi*q/(uab*v)*(SQRT(uab*ab) + dpl/v) 
+    
     eval_sigma_lda = s
   END FUNCTION eval_sigma_lda 
 !---------------------------------------------------------------------
-!	eval_k_lda
+!	eval_rate_lda
 !		James H. Thorpe
 !	-evaluates LDA rate coefficeint for given velocity
 !---------------------------------------------------------------------
@@ -120,9 +110,33 @@ MODULE lda
                                kb=1.38064852D-16
     REAL(KIND=8), INTENT(IN) :: v,q,uab,ab,dpl
     REAL(KIND=8) :: k
-    k = 2*pi*q/SQRT(uab)*(SQRT(ab)+dpl/v) 
+    !k = 2*pi*q/SQRT(uab)*(SQRT(ab)+dpl/v)  !theirs, wrong??
+    k = 2*pi*q/(uab)*(SQRT(uab*ab) + dpl/v) 
+
     eval_rate_lda = k
   END FUNCTION eval_rate_lda
+!---------------------------------------------------------------------
+!	eval_rcrit_lda
+!		James H. Thorpe
+!		Dec 6, 2018
+!	-evaluates the rc distance for LDA
+!---------------------------------------------------------------------
+  !v		: real*8, velocity
+  !q		: real*8, charge
+  !uab		: real*8, reduced mass
+  !ab		: real*8, polarizability
+  !dpl		: real*8, dipole moment
+  REAL(KIND=8) FUNCTION eval_rcrit_lda(v,q,uab,ab,dpl)
+    IMPLICIT NONE
+    REAL(KIND=8), PARAMETER :: pi=3.1415926535897932,&
+                               kb=1.38064852D-16
+    REAL(KIND=8), INTENT(IN) :: v,q,uab,ab,dpl 
+    REAL(KIND=8) :: rc
+    !rc = 2.0D0*ab*q**2.0D0/(uab*v**2.0D0*)
+    WRITE(*,*) "Not finished yet"
+    STOP
+
+  END FUNCTION eval_rcrit_lda
 !---------------------------------------------------------------------
 
 END MODULE lda
