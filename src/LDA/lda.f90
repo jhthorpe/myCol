@@ -38,7 +38,6 @@ MODULE lda
     dpl = vals(5)
 
     uab = ma*mb/(ma+mb)
-    WRITE(*,*) uab,T, alB,qa,dpl
     v_rms = SQRT(3*kb*T/uab)
     v_avg = SQRT(8*kb*T/(pi*uab))
     v_mp  = SQRT(2*kb*T/uab)
@@ -47,30 +46,43 @@ MODULE lda
     s_mp  = eval_sigma_lda(v_mp,qa,uab,alb,dpl)
 
     WRITE(*,*) "v RMS" 
-    WRITE(*,*) "v_rms     (cm/s, Å/ps) = ", v_rms, v_rms*1.0D-4
-    WRITE(*,*) "sigma_rms (cm^2, Å^2)  = ", s_rms, s_rms*1.0D16
-    WRITE(*,*) "bc_rms    (cm, Å)      = ", SQRT(s_rms/pi), SQRT(s_rms*1.0D16/pi)
-    WRITE(*,*) "------------------------"
+    WRITE(*,*) "v_rms     (Å/ps)    = ", v_rms*1.0D-4
+    WRITE(*,*) "sigma_rms (Å^2)     = ", s_rms*1.0D16
+    WRITE(*,*) "bc_rms    (Å)       = ", SQRT(s_rms*1.0D16/pi)
+    WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "<v>" 
-    WRITE(*,*) "v_avg     (cm/s, Å/ps) = ", v_avg, v_avg*1.0D-4
-    WRITE(*,*) "sigma_avg (cm^2, Å^2)  = ", s_avg, s_avg*1.0D16
-    WRITE(*,*) "bc_avg    (cm, Å)      = ", SQRT(s_avg/pi), SQRT(s_avg*1.0D16/pi)
-    WRITE(*,*) "------------------------"
+    WRITE(*,*) "v_avg     (Å/ps)    = ", v_avg*1.0D-4
+    WRITE(*,*) "sigma_avg (Å^2)     = ", s_avg*1.0D16
+    WRITE(*,*) "bc_avg    (Å)       = ", SQRT(s_avg*1.0D16/pi)
+    WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "v*" 
-    WRITE(*,*) "v_mp     (cm/s, Å/ps)  = ", v_mp, v_mp*1.0D-4
-    WRITE(*,*) "sigma_mp (cm^2, Å^2)   = ", s_mp, s_mp*1.0D16
-    WRITE(*,*) "bc_mp    (cm, Å)       = ", SQRT(s_mp/pi), SQRT(s_mp*1.0D16/pi)
-    WRITE(*,*) "------------------------"
+    WRITE(*,*) "v_mp      (Å/ps)    = ", v_mp*1.0D-4
+    WRITE(*,*) "sigma_mp  (Å^2)     = ", s_mp*1.0D16
+    WRITE(*,*) "bc_mp     (Å)       = ", SQRT(s_mp*1.0D16/pi)
+    WRITE(*,*) "---------------------"
     WRITE(*,*) 
-    WRITE(*,*) "Rate Coefficients"
-    WRITE(*,*) "k(v_rms) (cm^3/s)      = ", eval_rate_lda(v_rms,qa,uab,alB,dpl) 
-    WRITE(*,*) "k(v_avg) (cm^3/s)      = ", eval_rate_lda(v_avg,qa,uab,alB,dpl) 
-    WRITE(*,*) "k(v_mp)  (cm^3/s)      = ", eval_rate_lda(v_mp,qa,uab,alB,dpl) 
-    WRITE(*,*) "<k> @T   (cm^3/s)      = ", 2*pi*qa/SQRT(uab)*(SQRT(alB)+dpl*&
-                                            SQRT(2/(pi*kb*T)))
+    WRITE(*,*) "Rate Coefficients x10^9"
+    WRITE(*,*) "k(v_rms)  (cm^3/s)  = ", eval_rate_lda(v_rms,qa,uab,alB,dpl)*1.0D9 
+    WRITE(*,*) "k(v_avg)  (cm^3/s)  = ", eval_rate_lda(v_avg,qa,uab,alB,dpl)*1.0D9 
+    WRITE(*,*) "k(v_mp)   (cm^3/s)  = ", eval_rate_lda(v_mp,qa,uab,alB,dpl)*1.0D9 
+    WRITE(*,*) "<k> @T    (cm^3/s)  = ", 2*pi*qa/SQRT(uab)*(SQRT(alB)+dpl*&
+                                            SQRT(2.0D0/(pi*kb*T)))*1.0D9
     WRITE(*,*) "====================================================================="
+    WRITE(*,*) "in cgs..."
+    WRITE(*,*) "testing, v =, k=, ", v_avg/10.0D0, &
+    eval_rate_lda(v_avg/10.0D0,qa,uab,alB,dpl)*1.0D9
+    WRITE(*,*) "testing, v =, k=, ", v_avg/100.0D0, &
+    eval_rate_lda(v_avg/100.0D0,qa,uab,alB,dpl)*1.0D9
+    WRITE(*,*) "testing, v =, k=, ", v_avg/1000.0D0, &
+    eval_rate_lda(v_avg/1000.0D0,qa,uab,alB,dpl)*1.0D9
+    WRITE(*,*) "testing, v =, k=, ", v_avg/10000.0D0, &
+    eval_rate_lda(v_avg/10000.0D0,qa,uab,alB,dpl)*1.0D9
+    WRITE(*,*) "testing, v =, k=, ", v_avg/100000.0D0, &
+    eval_rate_lda(v_avg/100000.0D0,qa,uab,alB,dpl)*1.0D9
+    WRITE(*,*) "testing, v =, k=, ", v_avg/1000000.0D0, &
+    eval_rate_lda(v_avg/1000000.0D0,qa,uab,alB,dpl)*1.0D9
      
   END SUBROUTINE calc_lda
 !---------------------------------------------------------------------

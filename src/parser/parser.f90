@@ -378,7 +378,7 @@ MODULE parser
       WRITE(*,*) "Dipole Moment   :       D"
     END IF
     WRITE(*,*) "-------------------------------------"
-    WRITE(*,*) "Values used in calculation" 
+    WRITE(*,*) "Values (cgs) used in calculation" 
     WRITE(*,*) "massA+  ",new_val(0)
     WRITE(*,*) "massB   ",new_val(1)
     WRITE(*,*) "temp    ",new_val(2)

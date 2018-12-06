@@ -1,5 +1,5 @@
 export FC = gfortran
-export FFLAGS = -O3 -g -Wall -Wextra -Wshadow -fcheck=bounds
+export FFLAGS = -O3
 export bindir = /Users/jamesthorpe/local-hbar/myCol/bin
 export LFLAGS=-rcs
 export LC=ar
