@@ -2,7 +2,7 @@ calc	All
 massA+	40
 massB	26
 temp	300
-aB      28.3015747 
-units	au
+aB	5.69E-24		 
+units	cgs
 charge	+1
 dipole  0 

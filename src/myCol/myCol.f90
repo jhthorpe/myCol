@@ -4,10 +4,10 @@
 !			Dec 1, 2018
 !		-runs the myCol program
 !---------------------------------------------------------------------
-  !calc
 PROGRAM myCol
   USE parser
   USE langevin
+  USE lda 
   IMPLICIT NONE
   INTEGER :: calc
 
@@ -16,9 +16,13 @@ PROGRAM myCol
   CALL clean()
   CALL print_init()
   CALL get_input(calc)
-  IF (calc .EQ. 0) THEN
+  IF (calc .EQ. 0) THEN 
+    CALL calc_Lgv()
+    CALL calc_lda()
+  ELSE IF (calc .EQ. 1) THEN
     CALL calc_Lgv()
   END IF
+  CALL clean()
 
   CONTAINS
 !---------------------------------------------------------------------
@@ -27,7 +31,7 @@ PROGRAM myCol
 !		-cleans old junk
 !---------------------------------------------------------------------
   SUBROUTINE clean()
-    CALL EXECUTE_COMMAND_LINE('rm Lgv_vals error 2> /dev/null')
+    CALL EXECUTE_COMMAND_LINE('rm vals error 2> /dev/null')
   END SUBROUTINE clean
 !---------------------------------------------------------------------
 !               print_init
@@ -39,12 +43,12 @@ PROGRAM myCol
     IMPLICIT NONE
     
     WRITE(*,*)
-    WRITE(*,*) "======================================================"
-    WRITE(*,*) "                Starting myCol v0.0"
+    WRITE(*,*) "====================================================================="
+    WRITE(*,*) "                         Starting myCol v0.1"
     WRITE(*,*) 
-    WRITE(*,*) "                  James H. Thorpe"
-    WRITE(*,*) "                   Stanton Group"
-    WRITE(*,*) "             QTP, University of Florida"
+    WRITE(*,*) "                           James H. Thorpe"
+    WRITE(*,*) "                            Stanton Group"
+    WRITE(*,*) "                      QTP, University of Florida"
     WRITE(*,*) 
     
   END SUBROUTINE print_init

@@ -1,5 +1,5 @@
 export FC = gfortran
-export FFLAGS = -O3
+export FFLAGS = -O3 -g -Wall -Wextra -Wshadow -fcheck=bounds
 export bindir = /Users/jamesthorpe/local-hbar/myCol/bin
 export LFLAGS=-rcs
 export LC=ar
@@ -7,7 +7,7 @@ export pwd = $(shell pwd)
 export obj = $(pwd)/obj
 export mod = $(pwd)/mod
 
-progdirs:= units parser Langevin myCol
+progdirs:= units parser Langevin LDA myCol
 
 .PHONY: all prog clean
 
