@@ -67,8 +67,8 @@ MODULE lda
     WRITE(*,*) "k(v_rms)  (cm^3/s)  = ", eval_rate_lda(v_rms,qa,uab,alB,dpl)*1.0D9 
     WRITE(*,*) "k(v_avg)  (cm^3/s)  = ", eval_rate_lda(v_avg,qa,uab,alB,dpl)*1.0D9 
     WRITE(*,*) "k(v_mp)   (cm^3/s)  = ", eval_rate_lda(v_mp,qa,uab,alB,dpl)*1.0D9 
-    WRITE(*,*) "<k> @T    (cm^3/s)  = ", 2*pi*qa/uab*(SQRT(uab*alB)+2.0D0*dpl*&
-                                            SQRT(uab/(pi*kb*T)))*1.0D9
+    WRITE(*,*) "<k> @T    (cm^3/s)  = ", 2*pi*qa/uab*(SQRT(uab*alB)+dpl*&
+                                            SQRT(2.0D0*uab/(pi*kb*T)))*1.0D9
     WRITE(*,*) "====================================================================="
      
   END SUBROUTINE calc_lda
