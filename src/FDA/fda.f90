@@ -1,9 +1,9 @@
-MODULE lda
+MODULE fda
   IMPLICIT NONE
 
   CONTAINS
 !---------------------------------------------------------------------
-!	calc_lda
+!	calc_fda
 !		James H. Thorpe
 !		Dec 1, 2018
 !	- calculate Locked Dipole Approximation quantities
@@ -14,7 +14,7 @@ MODULE lda
   !T		: real*8, temperature
   !alb		: real*8, polarization of B
   !dpl		: real*8, dipole moment
-  SUBROUTINE calc_lda()
+  SUBROUTINE calc_fda()
     IMPLICIT NONE
     REAL(KIND=8), PARAMETER :: pi=3.1415926535897932,&
                                kb=1.38064852D-16
@@ -24,7 +24,7 @@ MODULE lda
 
     !vals = [massA+, massB, temp, aB, q, u]
     WRITE(*,*)
-    WRITE(*,*) "         Starting Locked Dipole Approximation Calculations"
+    WRITE(*,*) "         Starting Frozen Dipole Approximation Calculations"
     WRITE(*,*)
 
     OPEN(unit=100,file='vals',status='old')
@@ -41,39 +41,38 @@ MODULE lda
     v_rms = SQRT(3*kb*T/uab)
     v_avg = SQRT(8*kb*T/(pi*uab))
     v_mp  = SQRT(2*kb*T/uab)
-    s_rms = eval_sigma_lda(v_rms,qa,uab,alb,dpl)
-    s_avg = eval_sigma_lda(v_avg,qa,uab,alb,dpl)
-    s_mp  = eval_sigma_lda(v_mp,qa,uab,alb,dpl)
+    s_rms = eval_sigma_fda(v_rms,qa,uab,alb,dpl)
+    s_avg = eval_sigma_fda(v_avg,qa,uab,alb,dpl)
+    s_mp  = eval_sigma_fda(v_mp,qa,uab,alb,dpl)
 
     WRITE(*,*) "v RMS" 
     WRITE(*,*) "v_rms     (Å/ps)    = ", v_rms*1.0D-4
-    WRITE(*,*) "σ_rms (Å^2)     = ", s_rms*1.0D16
+    WRITE(*,*) "<σ>_rms  (Å^2)     = ", s_rms*1.0D16
     WRITE(*,*) "bc_rms    (Å)       = ", SQRT(s_rms*1.0D16/pi)
     WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "<v>" 
     WRITE(*,*) "v_avg     (Å/ps)    = ", v_avg*1.0D-4
-    WRITE(*,*) "σ_avg (Å^2)     = ", s_avg*1.0D16
+    WRITE(*,*) "<σ>_avg  (Å^2)     = ", s_avg*1.0D16
     WRITE(*,*) "bc_avg    (Å)       = ", SQRT(s_avg*1.0D16/pi)
     WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "v*" 
     WRITE(*,*) "v_mp      (Å/ps)    = ", v_mp*1.0D-4
-    WRITE(*,*) "σ_mp  (Å^2)     = ", s_mp*1.0D16
+    WRITE(*,*) "<σ>_mp   (Å^2)     = ", s_mp*1.0D16
     WRITE(*,*) "bc_mp     (Å)       = ", SQRT(s_mp*1.0D16/pi)
     WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "Rate Coefficients x10^9"
-    WRITE(*,*) "k(v_rms)  (cm^3/s)  = ", eval_rate_lda(v_rms,qa,uab,alB,dpl)*1.0D9 
-    WRITE(*,*) "k(v_avg)  (cm^3/s)  = ", eval_rate_lda(v_avg,qa,uab,alB,dpl)*1.0D9 
-    WRITE(*,*) "k(v_mp)   (cm^3/s)  = ", eval_rate_lda(v_mp,qa,uab,alB,dpl)*1.0D9 
-    WRITE(*,*) "<k> @T    (cm^3/s)  = ", 2*pi*qa/uab*(SQRT(uab*alB)+dpl*&
-                                            SQRT(2.0D0*uab/(pi*kb*T)))*1.0D9
+    WRITE(*,*) "k(v_rms)  (cm^3/s)  = ", v_rms*s_rms*1.0D9 
+    WRITE(*,*) "k(v_avg)  (cm^3/s)  = ", v_avg*s_avg*1.0D9 
+    WRITE(*,*) "k(v_mp)   (cm^3/s)  = ", v_mp*s_mp*1.0D9 
+    WRITE(*,*) "<k> @T    (cm^3/s)  = not coded yet"
     WRITE(*,*) "====================================================================="
      
-  END SUBROUTINE calc_lda
+  END SUBROUTINE calc_fda
 !---------------------------------------------------------------------
-!	eval_sigma_lda
+!	eval_sigma_fda
 !		James H. Thorpe
 !	-evaluates sigma for a given velocity in LDA 
 !---------------------------------------------------------------------
@@ -82,41 +81,42 @@ MODULE lda
   !uab		: real*8, reduced mass
   !ab		: real*8, polarizibility
   !dpl		: real*8, dipole moment
-  REAL(KIND=8) FUNCTION eval_sigma_lda(v,q,uab,ab,dpl)
+  REAL(KIND=8) FUNCTION eval_sigma_fda(v,q,uab,ab,dpl)
     IMPLICIT NONE 
     REAL(KIND=8), PARAMETER :: pi=3.1415926535897932,&
                                kb=1.38064852D-16
     REAL(KIND=8), INTENT(IN) :: v,q,uab,ab,dpl
-    REAL(KIND=8) :: s
-    !s = 2*pi*q/(SQRT(uab)*v)*(SQRT(ab) + dpl/v)  !theirs, wrong??
-    ! or perhaps correct, just not in cgs?
-    s = 2*pi*q/(uab*v)*(SQRT(uab*ab) + dpl/v) 
+    REAL(KIND=8) :: s,Er,ec
+    Er = 0.5D0*uab*v**2.0D0
+    ec = dpl**2.0D0/(2*ab)
+    s = pi*dpl*q/(4*Er)*(1 - Er/ec)+SQRT(ab*q**2.0D0/(2*Er)) + ab*q/dpl
     
-    eval_sigma_lda = s
-  END FUNCTION eval_sigma_lda 
+    eval_sigma_fda = s
+  END FUNCTION eval_sigma_fda 
 !---------------------------------------------------------------------
-!	eval_rate_lda
+!	eval_rate_fda
 !		James H. Thorpe
-!	-evaluates LDA rate coefficeint for given velocity
+!	-evaluates FDA <rate coefficeint>
 !---------------------------------------------------------------------
-  !v		: real*8, velocity
   !q		: real*8, charge
   !uab		: real*8, reduced mass
   !ab		: real*8, polarizibility
   !dpl		: real*8, dipole moment
-  REAL(KIND=8) FUNCTION eval_rate_lda(v,q,uab,ab,dpl)
+  !T		: real*8, temperature
+  REAL(KIND=8) FUNCTION eval_rate_fda(q,uab,ab,dpl,T)
     IMPLICIT NONE 
     REAL(KIND=8), PARAMETER :: pi=3.1415926535897932,&
                                kb=1.38064852D-16
-    REAL(KIND=8), INTENT(IN) :: v,q,uab,ab,dpl
-    REAL(KIND=8) :: k
-    !k = 2*pi*q/SQRT(uab)*(SQRT(ab)+dpl/v)  !theirs, wrong??
-    k = 2*pi*q/(uab)*(SQRT(uab*ab) + dpl/v) 
+    REAL(KIND=8), INTENT(IN) :: q,uab,ab,dpl,T
+    REAL(KIND=8) :: k,Er,ec
+    !Er = 0.5D0*uab*v**2.0D0
+    !ec = dpl**2.0D0/(2*ab)
+    STOP "Thermal average rate depends on velocity??" 
 
-    eval_rate_lda = k
-  END FUNCTION eval_rate_lda
+    eval_rate_fda = k
+  END FUNCTION eval_rate_fda
 !---------------------------------------------------------------------
-!	eval_rcrit_lda
+!	eval_rcrit_fda
 !		James H. Thorpe
 !		Dec 6, 2018
 !	-evaluates the rc distance for LDA
@@ -126,7 +126,7 @@ MODULE lda
   !uab		: real*8, reduced mass
   !ab		: real*8, polarizability
   !dpl		: real*8, dipole moment
-  REAL(KIND=8) FUNCTION eval_rcrit_lda(v,q,uab,ab,dpl)
+  REAL(KIND=8) FUNCTION eval_rcrit_fda(v,q,uab,ab,dpl)
     IMPLICIT NONE
     REAL(KIND=8), PARAMETER :: pi=3.1415926535897932,&
                                kb=1.38064852D-16
@@ -136,7 +136,7 @@ MODULE lda
     WRITE(*,*) "Not finished yet"
     STOP
 
-  END FUNCTION eval_rcrit_lda
+  END FUNCTION eval_rcrit_fda
 !---------------------------------------------------------------------
 
-END MODULE lda
+END MODULE fda

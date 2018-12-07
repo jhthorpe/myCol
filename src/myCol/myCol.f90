@@ -8,6 +8,8 @@ PROGRAM myCol
   USE parser
   USE langevin
   USE lda 
+  USE fda
+  USE ado
   IMPLICIT NONE
   INTEGER :: calc
 
@@ -19,8 +21,16 @@ PROGRAM myCol
   IF (calc .EQ. 0) THEN 
     CALL calc_Lgv()
     CALL calc_lda()
+    CALL calc_fda()
+    CALL calc_ado()
   ELSE IF (calc .EQ. 1) THEN
     CALL calc_Lgv()
+  ELSE IF (calc .EQ. 2) THEN
+    CALL calc_lda()
+  ELSE IF (calc .EQ. 3) THEN
+    CALL calc_fda()
+  ELSE IF (calc .EQ. 4) THEN
+    CALL calc_ado()
   END IF
   CALL clean()
 

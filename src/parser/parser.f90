@@ -97,11 +97,17 @@ MODULE parser
         IF (line(1) .EQ. 'All' .OR. line(1) .EQ. 'all') THEN
           calc = 0
           found = .TRUE.
-        ELSE IF (line(1) .EQ. 'Lgv') THEN
+        ELSE IF (line(1) .EQ. 'Lgv' .OR. line(1) .EQ. 'LGV') THEN
           calc = 1
           found = .TRUE.
         ELSE IF (line(1) .EQ. 'LDA') THEN
           calc = 2
+          found = .TRUE.
+        ELSE IF (line(1) .EQ. 'FDA') THEN
+          calc = 3
+          found = .TRUE.
+        ELSE IF (line(1) .EQ. 'ADO') THEN
+          calc = 4
           found = .TRUE.
         END IF
       END IF
@@ -114,6 +120,8 @@ MODULE parser
       WRITE(*,*) "All"
       WRITE(*,*) "Lgv"
       WRITE(*,*) "LDA"
+      WRITE(*,*) "FDA"
+      WRITE(*,*) "ADO"
     END IF
 
   END SUBROUTINE get_calc

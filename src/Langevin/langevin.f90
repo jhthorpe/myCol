@@ -45,21 +45,21 @@ MODULE langevin
 
     WRITE(*,*) "v RMS" 
     WRITE(*,*) "v_rms     (Å/ps)    = ", v_rms*1.0D-4
-    WRITE(*,*) "sigma_rms (Å^2)     = ", s_rms*1.0D16
+    WRITE(*,*) "σ_rms (Å^2)     = ", s_rms*1.0D16
     WRITE(*,*) "bc_rms    (Å)       = ", SQRT(s_rms*1.0D16/pi)
     WRITE(*,*) "rc_rms    (Å)       = ", SQRT(s_rms*1.0D16/pi)/SQRT(2.0)
     WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "<v>" 
     WRITE(*,*) "v_avg     (Å/ps)    = ", v_avg*1.0D-4
-    WRITE(*,*) "sigma_avg (Å^2)     = ", s_avg*1.0D16
+    WRITE(*,*) "σ_avg (Å^2)     = ", s_avg*1.0D16
     WRITE(*,*) "bc_avg    (Å)       = ", SQRT(s_avg*1.0D16/pi)
     WRITE(*,*) "rc_avg    (Å)       = ", SQRT(s_avg*1.0D16/pi)/SQRT(2.0)
     WRITE(*,*) "---------------------"
     WRITE(*,*) 
     WRITE(*,*) "v*" 
     WRITE(*,*) "v_mp     (Å/ps)     = ", v_mp*1.0D-4
-    WRITE(*,*) "sigma_mp (Å^2)      = ", s_mp*1.0D16
+    WRITE(*,*) "σ_mp (Å^2)      = ", s_mp*1.0D16
     WRITE(*,*) "bc_mp    (Å)        = ", SQRT(s_mp*1.0D16/pi)
     WRITE(*,*) "rc_mp    (Å)        = ", SQRT(s_mp*1.0D16/pi)/SQRT(2.0)
     WRITE(*,*) "---------------------"
